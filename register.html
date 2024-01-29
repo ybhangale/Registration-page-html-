@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Registration Page</title>
+	<link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+	<div class="container">
+		<h2>Registration Page</h2>
+		<form action="/register" method="post">
+			<div class="form-group">
+				<label for="register-username">Username:</label>
+				<input type="text" id="register-username" name="username" required>
+			</div>
+			<div class="form-group">
+				<label for="register-password">Password:</label>
+				<input type="password" id="register-password" name="password" required>
+			</div>
+			<div class="form-group">
+				<label for="confirm-password">Confirm Password:</label>
+				<input type="password" id="confirm-password" name="confirm-password" required>
+			</div>
+			<div class="form-group">
+				<input type="submit" value="Sign Up">
+			</div>
+			<p>Already have an account? <a href="login.html">Sign In</a></p>
+		</form>
+		<div id="error-message" style="display:none;">
+			<p>Error: The username already exists.</p>
+		</div>
+	</div>
+	<script>
+		document.getElementById('register').addEventListener('submit', function(event) {
+			event.preventDefault();
+			var username = document.getElementById('register-username').value;
+			var password = document.getElementById('register-password').value;
+			var confirmPassword = document.getElementById('confirm-password').value;
+			if (password !== confirmPassword) {
+				alert('Error: The passwords do not match.');
+				return;
+			}
+			// Send registration request to the server
+			fetch('/register', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					username: username,
+					password: password
+				})
+			})
+			.then(function(response) {
+				if (response.ok) {
+					alert('Registration successful. Please sign in.');
+					// Redirect to login page
+					window.location.href = '/login';
+				} else {
+					response.json().then(function(data) {
+						if (data.message === 'Username already exists.') {
+							document.getElementById('error-message').style.display = 'block';
+						} else {
+							alert('Error: ' + data.message);
+						}
+					});
+				}
+			});
+		});
+	</script>
+</body>
+</html>
